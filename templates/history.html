@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat History - AI Bank</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .history-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .message-pair {
+            margin-bottom: 15px;
+        }
+
+        .user-message {
+            background: #e3f2fd;
+            padding: 10px 15px;
+            border-radius: 15px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .bot-response {
+            background: #f5f5f5;
+            padding: 10px 15px;
+            border-radius: 15px;
+            margin-left: 20px;
+        }
+
+        .message-meta {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💬 Chat History</h1>
+            <p>Your conversation history with AI Bank</p>
+        </div>
+
+        <div class="content">
+            <a href="javascript:window.close()" class="back-btn">← Close Window</a>
+
+            {% if chat_history %}
+                {% for chat in chat_history %}
+                    <div class="history-item">
+                        <div class="message-pair">
+                            <div class="user-message">
+                                <strong>You:</strong> {{ chat.message }}
+                            </div>
+                            <div class="bot-response">
+                                <strong>AI Bank:</strong> {{ chat.response|replace('\n', '<br>')|safe }}
+                            </div>
+                            <div class="message-meta">
+                                {{ chat.timestamp }} | Intent: {{ chat.intent }} | Confidence: {{ chat.confidence }}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <h3>No chat history yet</h3>
+                    <p>Start chatting to see your conversation history here!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

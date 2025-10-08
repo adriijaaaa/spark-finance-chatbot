@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Spark Finance</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fa;
+        }
+
+        nav {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 1rem 2rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo span {
+            color: #ffd700;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-card h2 {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .section h3 {
+            color: #1e3c72;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-retrain {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            margin-left: 1rem;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th, .table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        #retrain-status {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">Spark <span>Finance</span> - Admin</div>
+        <div class="nav-links">
+            <a href="/admin">Dashboard</a>
+            <a href="/dashboard">User View</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 style="margin-bottom: 2rem; color: #1e3c72;">Admin Dashboard</h1>
+
+        <div id="retrain-status"></div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h2>{{ total_users }}</h2>
+                <p>Total Users</p>
+            </div>
+            <div class="stat-card">
+                <h2>{{ total_chats }}</h2>
+                <p>Total Conversations</p>
+            </div>
+            <div class="stat-card">
+                <h2>{{ pending_intents }}</h2>
+                <p>Pending Intent Requests</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>📝 Add Training Data & Model Management</h3>
+            <form method="POST" action="/admin/intent/add">
+                <div class="form-group">
+                    <label for="intent_name">Intent Name:</label>
+                    <input type="text" id="intent_name" name="intent_name" placeholder="e.g., check_account_balance" required>
+                </div>
+                <div class="form-group">
+                    <label for="example_text">Example User Query:</label>
+                    <textarea id="example_text" name="example_text" rows="3" placeholder="e.g., What is my current balance?" required></textarea>
+                </div>
+                <div class="btn-group">
+                    <button type="submit" class="btn">Add Intent</button>
+                    <button type="button" class="btn btn-retrain" onclick="retrainModel()">🔄 Retrain Model</button>
+                </div>
+            </form>
+            <p style="margin-top: 1rem; font-size: 0.9rem; color: #666;">
+                💡 Add new intents above, then click "Retrain Model" to update the AI with new training data.
+            </p>
+        </div>
+
+        <div class="section">
+            <h3>🙋 Human Agent Requests</h3>
+            {% if escalation_requests %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Ticket #</th>
+                            <th>User</th>
+                            <th>Question</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in escalation_requests %}
+                        <tr>
+                            <td><strong>#{{ req.id }}</strong></td>
+                            <td>{{ req.username }}</td>
+                            <td>{{ req.user_question[:50] }}...</td>
+                            <td>{{ req.created_at[:16] }}</td>
+                            <td><span class="badge badge-pending">{{ req.status }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No escalation requests.</p>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <h3>⏳ Pending Intent Suggestions</h3>
+            {% if pending_intent_list %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Intent Name</th>
+                            <th>Example Text</th>
+                            <th>Suggested By</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for intent in pending_intent_list %}
+                        <tr>
+                            <td><strong>{{ intent.intent_name }}</strong></td>
+                            <td>{{ intent.example_text }}</td>
+                            <td>{{ intent.username }}</td>
+                            <td>{{ intent.created_at[:10] }}</td>
+                            <td><span class="badge badge-pending">Pending</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No pending intent suggestions.</p>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <h3>💬 Recent Chat Logs (Last 50)</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Message</th>
+                        <th>Intent</th>
+                        <th>Confidence</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for chat in recent_chats %}
+                    <tr>
+                        <td><strong>{{ chat.username }}</strong></td>
+                        <td>{{ chat.message[:50] }}...</td>
+                        <td>{{ chat.intent }}</td>
+                        <td>{{ chat.confidence }}</td>
+                        <td>{{ chat.timestamp[:16] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function retrainModel() {
+            const statusDiv = document.getElementById('retrain-status');
+            const btn = event.target;
+            
+            btn.disabled = true;
+            btn.textContent = '⏳ Retraining... (This may take 5-10 minutes)';
+            
+            statusDiv.innerHTML = '<div class="alert alert-success">🔄 Model retraining started. Please wait...</div>';
+            statusDiv.style.display = 'block';
+            
+            try {
+                const response = await fetch('/admin/retrain', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    statusDiv.innerHTML = '<div class="alert alert-success">✅ ' + data.message + '</div>';
+                } else {
+                    statusDiv.innerHTML = '<div class="alert alert-error">❌ ' + data.message + '</div>';
+                }
+                
+            } catch (error) {
+                statusDiv.innerHTML = '<div class="alert alert-error">❌ Error: ' + error.message + '</div>';
+            }
+            
+            btn.disabled = false;
+            btn.textContent = '🔄 Retrain Model';
+        }
+    </script>
+</body>
+</html>
